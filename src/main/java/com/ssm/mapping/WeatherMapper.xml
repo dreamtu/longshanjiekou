@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.dao.WeatherMapper">
+  <resultMap id="BaseResultMap" type="com.ssm.model.Weather">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="city" jdbcType="VARCHAR" property="city" />
+    <result column="img" jdbcType="VARCHAR" property="img" />
+    <result column="temp" jdbcType="VARCHAR" property="temp" />
+    <result column="temp_high" jdbcType="VARCHAR" property="tempHigh" />
+    <result column="temp_low" jdbcType="VARCHAR" property="tempLow" />
+    <result column="wind_direction" jdbcType="VARCHAR" property="windDirection" />
+    <result column="wind_level" jdbcType="VARCHAR" property="windLevel" />
+    <result column="wind_speed" jdbcType="VARCHAR" property="windSpeed" />
+    <result column="total_precitation" jdbcType="VARCHAR" property="totalPrecitation" />
+    <result column="date" jdbcType="VARCHAR" property="date" />
+    <result column="week" jdbcType="VARCHAR" property="week" />
+    <result column="updatetime" jdbcType="TIMESTAMP" property="updatetime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, city, img, temp, temp_high, temp_low, wind_direction, wind_level, wind_speed, 
+    total_precitation, date, week, updatetime
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from rec_weather
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="weatherByDate" resultType="string"><!--数据库是否有某天的数据 最大值-->
+    select
+    max(substring(date,1,10)) as date
+    from rec_weather
+  </select>
+  <select id="rainMonthSelect" resultType="map"><!--月降水量 某月数据库是否存在-->
+    SELECT
+    DATE_FORMAT(updatetime, '%Y') year,DATE_FORMAT(updatetime, '%m') month,city,sum(total_precitation) total_precitation,max(updatetime) updatetime
+    FROM rec_weather
+    WHERE
+    DATE_FORMAT(updatetime, '%Y') = year( curdate()) and DATE_FORMAT(updatetime, '%m')=DATE_FORMAT(now(), '%m')
+  </select>
+  <select id="rainYearSelect" resultType="map"><!--年降水量 某年数据库是否存在-->
+    SELECT
+    DATE_FORMAT(updatetime, '%Y') year,DATE_FORMAT(updatetime, '%m') month,city,sum(total_precitation) total_precitation,max(updatetime) updatetime
+    FROM rec_weather
+    WHERE
+    DATE_FORMAT(updatetime, '%Y') = year( curdate())
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from rec_weather
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.ssm.model.Weather">
+    insert into rec_weather (id, city, img, 
+      temp, temp_high, temp_low, 
+      wind_direction, wind_level, wind_speed, 
+      total_precitation, date, week, 
+      updatetime)
+    values (#{id,jdbcType=INTEGER}, #{city,jdbcType=VARCHAR}, #{img,jdbcType=VARCHAR}, 
+      #{temp,jdbcType=VARCHAR}, #{tempHigh,jdbcType=VARCHAR}, #{tempLow,jdbcType=VARCHAR}, 
+      #{windDirection,jdbcType=VARCHAR}, #{windLevel,jdbcType=VARCHAR}, #{windSpeed,jdbcType=VARCHAR}, 
+      #{totalPrecitation,jdbcType=VARCHAR}, #{date,jdbcType=VARCHAR}, #{week,jdbcType=VARCHAR}, 
+      #{updatetime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.model.Weather">
+    insert into rec_weather
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="city != null">
+        city,
+      </if>
+      <if test="img != null">
+        img,
+      </if>
+      <if test="temp != null">
+        temp,
+      </if>
+      <if test="tempHigh != null">
+        temp_high,
+      </if>
+      <if test="tempLow != null">
+        temp_low,
+      </if>
+      <if test="windDirection != null">
+        wind_direction,
+      </if>
+      <if test="windLevel != null">
+        wind_level,
+      </if>
+      <if test="windSpeed != null">
+        wind_speed,
+      </if>
+      <if test="totalPrecitation != null">
+        total_precitation,
+      </if>
+      <if test="date != null">
+        date,
+      </if>
+      <if test="week != null">
+        week,
+      </if>
+      <if test="updatetime != null">
+        updatetime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="city != null">
+        #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="img != null">
+        #{img,jdbcType=VARCHAR},
+      </if>
+      <if test="temp != null">
+        #{temp,jdbcType=VARCHAR},
+      </if>
+      <if test="tempHigh != null">
+        #{tempHigh,jdbcType=VARCHAR},
+      </if>
+      <if test="tempLow != null">
+        #{tempLow,jdbcType=VARCHAR},
+      </if>
+      <if test="windDirection != null">
+        #{windDirection,jdbcType=VARCHAR},
+      </if>
+      <if test="windLevel != null">
+        #{windLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="windSpeed != null">
+        #{windSpeed,jdbcType=VARCHAR},
+      </if>
+      <if test="totalPrecitation != null">
+        #{totalPrecitation,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        #{date,jdbcType=VARCHAR},
+      </if>
+      <if test="week != null">
+        #{week,jdbcType=VARCHAR},
+      </if>
+      <if test="updatetime != null">
+        #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.model.Weather">
+    update rec_weather
+    <set>
+      <if test="city != null">
+        city = #{city,jdbcType=VARCHAR},
+      </if>
+      <if test="img != null">
+        img = #{img,jdbcType=VARCHAR},
+      </if>
+      <if test="temp != null">
+        temp = #{temp,jdbcType=VARCHAR},
+      </if>
+      <if test="tempHigh != null">
+        temp_high = #{tempHigh,jdbcType=VARCHAR},
+      </if>
+      <if test="tempLow != null">
+        temp_low = #{tempLow,jdbcType=VARCHAR},
+      </if>
+      <if test="windDirection != null">
+        wind_direction = #{windDirection,jdbcType=VARCHAR},
+      </if>
+      <if test="windLevel != null">
+        wind_level = #{windLevel,jdbcType=VARCHAR},
+      </if>
+      <if test="windSpeed != null">
+        wind_speed = #{windSpeed,jdbcType=VARCHAR},
+      </if>
+      <if test="totalPrecitation != null">
+        total_precitation = #{totalPrecitation,jdbcType=VARCHAR},
+      </if>
+      <if test="date != null">
+        date = #{date,jdbcType=VARCHAR},
+      </if>
+      <if test="week != null">
+        week = #{week,jdbcType=VARCHAR},
+      </if>
+      <if test="updatetime != null">
+        updatetime = #{updatetime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.model.Weather">
+    update rec_weather
+    set city = #{city,jdbcType=VARCHAR},
+      img = #{img,jdbcType=VARCHAR},
+      temp = #{temp,jdbcType=VARCHAR},
+      temp_high = #{tempHigh,jdbcType=VARCHAR},
+      temp_low = #{tempLow,jdbcType=VARCHAR},
+      wind_direction = #{windDirection,jdbcType=VARCHAR},
+      wind_level = #{windLevel,jdbcType=VARCHAR},
+      wind_speed = #{windSpeed,jdbcType=VARCHAR},
+      total_precitation = #{totalPrecitation,jdbcType=VARCHAR},
+      date = #{date,jdbcType=VARCHAR},
+      week = #{week,jdbcType=VARCHAR},
+      updatetime = #{updatetime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
